@@ -19,7 +19,7 @@
  * @return 1 if there are read errors.
  * @return 255 for generic errors.
  */
-unsigned short load_resource(const std::string& path);
+unsigned short load_resource(const std::string &path);
 
 /**
  * @brief Retrieve the value of a key from the loaded INI resource.
@@ -34,7 +34,7 @@ unsigned short load_resource(const std::string& path);
  * @return 4 if a resource file has not been loaded yet.
  * @return 255 for generic errors.
  */
-unsigned short get_value(const std::string& key, std::string& value);
+unsigned short get_value(const std::string &key, std::string &value);
 
 /**
  * @brief Store or update the value of a key in the loaded INI resource and the INI file.
@@ -48,7 +48,27 @@ unsigned short get_value(const std::string& key, std::string& value);
  * @return 4 if a resource file has not been loaded yet
  * @return 255 for generic errors.
  */
-unsigned short set_value(const std::string& key, const std::string& value);
+unsigned short set_value(const std::string &key, const std::string &value);
 
+/**
+ * @brief Dump values in ini file previously loaded
+ *
+ * @return 255 if file has not been previously loaded or if it does not exists.
+ */
+unsigned short dump_values();
+
+/**
+ * @brief Deletes a value from the ini_data map.
+ *
+ * This function deletes a key-value pair from the ini_data map based on the provided key.
+ * If the key is found, the corresponding key-value pair is removed from the map.
+ *
+ * @param key The key in the format "section.key" specifying the section and key to delete.
+ * @return 0 if Success.
+ * @return 3 if section or key not found.
+ * @return 4 ir resource file not loaded (ini_data is empty).
+ * @return 255 for generic error
+ */
+unsigned short delete_value(const std::string &key);
 
 #endif // LIB_INI_HANDLER_H
