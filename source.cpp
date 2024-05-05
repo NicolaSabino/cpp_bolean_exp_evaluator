@@ -12,6 +12,9 @@
 // https://www.meziantou.net/creating-a-parser-for-boolean-expressions.htm
 // https://www2.lawrence.edu/fast/GREGGJ/CMSC270/parser/parser.html
 
+/**
+ * @brief The token type enum
+ */
 enum class TokenType
 {
     T_LX_PAREN,
@@ -24,6 +27,12 @@ enum class TokenType
     T_BOOL
 };
 
+/**
+ * @brief The token struct
+ *
+ * Each token represent a
+ * terminal element for our grammar
+ */
 struct Token
 {
     TokenType type;
@@ -46,7 +55,6 @@ std::vector<Token> tokenize(const std::string &input_string)
 {
     std::vector<Token> tokens;
     std::string buffer; // To store characters temporarily
-
 
     for (char c : input_string)
     {
@@ -72,7 +80,7 @@ std::vector<Token> tokenize(const std::string &input_string)
             {
                 // special case  for bug related to val 3 in e6
                 if (buffer.at(0) == 'v' && buffer.size() >= 2)
-                    tokens.push_back({TokenType::T_ID, buffer}); 
+                    tokens.push_back({TokenType::T_ID, buffer});
                 else
                     tokens.push_back({TokenType::T_NUMBER, buffer});
                 tokens.push_back({TokenType::T_RX_PAREN, std::string{c}});
@@ -97,7 +105,7 @@ std::vector<Token> tokenize(const std::string &input_string)
                 buffer += c;
                 continue;
             }
-                
+
             buffer.clear();
         }
     }
@@ -110,8 +118,6 @@ std::vector<Token> tokenize(const std::string &input_string)
             tokens.push_back({TokenType::T_NUMBER, buffer});
         buffer.clear();
     }
-
-    // tokens.push_back({TokenType::T_END, ""});
 
     return tokens;
 }
@@ -133,11 +139,29 @@ void tokenizeSanityCheck()
     assert(res[27].value == "!");
 }
 
+/**
+ * @brief The Parser class
+ *
+ * Parser relies on `tokenize` function
+ * to extract lexical info form input string.
+ *
+ * @see tokenize
+ */
 class Parser
 {
 public:
     Parser(const std::string &expression, const std::map<std::string, std::string> values)
         : expression(expression), values(values){};
+
+    /**
+     * @brief Process expression
+     *
+     * Process the parser expression
+     *
+     * @see tokenize
+     * @return true If expression result is true
+     * @return false If expression result is false
+     */
     bool parse();
 
 private:
@@ -160,22 +184,57 @@ private:
      */
     bool isNumberComparisson();
 
-    bool isBooleanComparisson();
-    bool isNegation();
-    bool isBooleanVariable();
     /**
-     * @brief Compare operation
+     * @brief Check if last token is bool comparisson
      *
-     * Reduce a comparison operation to a
-     * `true/false` value
+     * Check if last 3 token in token buffer is a boolean
+     * coparisson and and operator is == && or ||.
      *
-     * It automatically fetch the last 3 elements in Parser::tokenBuffer
+     * @return true If buffer contains bool comparisson.
+     * @return false Otherwise or buffer is too small.
+     */
+    bool isBooleanComparisson();
+
+    /**
+     * @brief Check if last two token is negation
      *
+     * Check if last two token is bool value and negation.
+     *
+     * @return true If is negation.
+     * @return false Otherwise or buffer is too small.
+     */
+    bool isNegation();
+
+    /**
+     * @brief Check if the last token in buffer is bool
+     *
+     * @return true If token is bool
+     * @return false Otherwise or buffer is empty.
+     */
+    bool isBooleanVariable();
+
+    /**
+     * @brief Process comparisson and update buffer.
      * @see Parser::reduce
      */
     void compareNumbers();
+
+    /**
+     * @brief Process bool comparisson and update buffer.
+     * @see Parser::reduce
+     */
     void compareBooleans();
+
+    /**
+     * @brief Process negation and update buffer.
+     * @see Parser::reduce
+     */
     void negate();
+
+    /**
+     * @brief Process bool token evaluation
+     * @see Parser::reduce
+     */
     void evaluateBoolean();
 
     /**
@@ -184,17 +243,42 @@ private:
      * Convert a number or id into
      * corresponding float value
      *
+     * If value is variable retrieve it from values map.
+     * If value is number convert it to float.
+     *
      * @param t The input token
      * @param values The hasmap of vlaues
      * @return const float The value extracted from token.
      */
     const float getValue(const Token &t);
 
+    /**
+     * @brief Check if token is variable or value
+     *
+     * @return true If value is variable or float value.
+     * @return false Otherwise.
+     */
     static const bool isTokenVariableOrValue(const Token &t);
 
 private:
-    std::string expression;
-    std::map<std::string, std::string> values;
+    /**
+     * @brief The expression to be processed
+     */
+    const std::string expression;
+
+    /**
+     * @brief The variable values
+     */
+    const std::map<std::string, std::string> values;
+
+    /**
+     * @brief The token buffer
+     *
+     * It is used to push and pop token
+     * during the reduce routine
+     *
+     * @see Parser::reduce
+     */
     std::vector<Token> tokenBuffer;
 };
 
@@ -246,7 +330,7 @@ bool Parser::isNegation()
     // pop last two item
     const auto valueToken = this->tokenBuffer[bufferSize - 1];
     const auto negationToken = this->tokenBuffer[bufferSize - 2];
-    const bool isNegation =  negationToken.value == "!";
+    const bool isNegation = negationToken.value == "!";
     const bool isBoolValue = valueToken.type == TokenType::T_BOOL;
     return isNegation && isBoolValue;
 }
@@ -316,7 +400,8 @@ bool Parser::isBooleanVariable()
 {
     const int bufferSize = this->tokenBuffer.size();
     const auto token = this->tokenBuffer[bufferSize - 1];
-    if (token.type != TokenType::T_ID) return false;
+    if (token.type != TokenType::T_ID)
+        return false;
     const auto stringValue = this->values.at(token.value);
     return stringValue == "true" || stringValue == "false";
 }
@@ -344,12 +429,12 @@ void Parser::reduce()
     }
     else if (this->isNegation())
     {
-        //process negation
+        // process negation
         this->negate();
     }
     else if (this->isBooleanVariable())
     {
-        //reduce to boolean
+        // reduce to boolean
         this->evaluateBoolean();
     }
 };
@@ -374,16 +459,17 @@ bool Parser::parse()
 
         if (isClosingBraket) // pop '('
         {
-            for (auto itr = this->tokenBuffer.rbegin(); itr < this->tokenBuffer.rend(); itr++) { 
-        
-                if ((*itr).value == "(") 
-                { 
-                    this->tokenBuffer.erase((itr + 1).base()); 
+            for (auto itr = this->tokenBuffer.rbegin(); itr < this->tokenBuffer.rend(); itr++)
+            {
+
+                if ((*itr).value == "(")
+                {
+                    this->tokenBuffer.erase((itr + 1).base());
                     break;
-                } 
-            } 
+                }
+            }
         }
-           // this->tokenBuffer.erase(this->tokenBuffer.end() - 2, this->tokenBuffer.end() - 1); 
+        // this->tokenBuffer.erase(this->tokenBuffer.end() - 2, this->tokenBuffer.end() - 1);
     }
 
     while (this->tokenBuffer.size() > 1)
@@ -393,6 +479,20 @@ bool Parser::parse()
     return this->tokenBuffer.front().value == "true";
 };
 
+/**
+ * @brief Evalue expression
+ *
+ * There is no syntax expression assessment.
+ * If the expression is not syntattically correct the first
+ * boolean value found will retrun.
+ *
+ * @todo implement syntax assessment.
+ *
+ * @param expression The expression to be assessed
+ * @param values Map of string values to be converted within expression
+ * @return true If expression boolean value is true.
+ * @return false Otherwise.
+ */
 bool evaluate(std::string &expression, std::map<std::string, std::string> &values)
 {
     Parser parser{expression, values};
@@ -443,12 +543,12 @@ int main(int argc, char **argv)
     // false
 
     // e6.
-    // ((v0 == 2 || ( v1 > 10 && v2 > 3)) && v3 == -15.000000001 && v4) && (v5 == !v4) 
+    // ((v0 == 2 || ( v1 > 10 && v2 > 3)) && v3 == -15.000000001 && v4) && (v5 == !v4)
     // (( false || ( true && false )) && true && true) && (false == false)
     // (( false || false ) && true && true ) && true
     // ( false && true && true ) && true
     // false && true
-    // false 
+    // false
 
     m["v0"] = "1";
     m["v1"] = "15.55";
@@ -459,11 +559,11 @@ int main(int argc, char **argv)
 
     bool testCorrect =
         (evaluate(e1, m) &
-             evaluate(e2, m) &
-             !evaluate(e3, m) &
-             !evaluate(e4, m) &
-             !evaluate(e5, m) & // <-- error in the assignement
-             !evaluate(e6, m) & // <-- error in the assignement
+         evaluate(e2, m) &
+         !evaluate(e3, m) &
+         !evaluate(e4, m) &
+         !evaluate(e5, m) & // <-- error in the assignement
+         !evaluate(e6, m) & // <-- error in the assignement
          evaluate(e7, m));
 
     std::cout << (testCorrect ? "Good job!" : "Uhm, please retry!") << std::endl;
