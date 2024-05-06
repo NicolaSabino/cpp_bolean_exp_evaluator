@@ -17,6 +17,7 @@ void trimString(std::string &targetString)
 {
     targetString.erase(0, targetString.find_first_not_of(" \t"));
     targetString.erase(targetString.find_last_not_of(" \t") + 1);
+    targetString.erase(targetString.find_last_not_of("\n") + 1);
 }
 
 std::tuple<std::string, std::string> splitHeader(const std::string &key)
@@ -41,11 +42,12 @@ std::tuple<std::string, std::string> splitHeader(const std::string &key)
 
 unsigned short load_resource(const std::string &path)
 {
-
-    std::ifstream file(path);
+    std::string processedPath{path};
+    trimString(processedPath);
+    std::ifstream file(processedPath);
     if (!file.is_open())
     {
-        std::cerr << "ERR: Unable to open file " << path << std::endl;
+        std::cerr << "ERR: Unable to open file " << processedPath << std::endl;
         return 1;
     }
     else
@@ -93,6 +95,9 @@ unsigned short load_resource(const std::string &path)
 
 unsigned short get_value(const std::string &key, std::string &value)
 {
+    std::string processedKey{key};
+    trimString(processedKey);
+
     // Check if a resource file has been loaded
     if (ini_data.empty())
     {
@@ -101,7 +106,7 @@ unsigned short get_value(const std::string &key, std::string &value)
     }
 
     std::string iniSection, iniKey;
-    std::tie(iniSection, iniKey) = splitHeader(key);
+    std::tie(iniSection, iniKey) = splitHeader(processedKey);
 
     // find section
     auto sectionPositionIt = ini_data.find(iniSection);

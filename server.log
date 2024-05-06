@@ -1,0 +1,5 @@
+Server listening on port 12345
+INF: file test_file/config.ini
+ successfully loaded
+WRN: corrupted header Dummy
+ERR: Section 'Dummy' not found in the resource file

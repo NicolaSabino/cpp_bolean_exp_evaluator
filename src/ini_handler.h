@@ -41,6 +41,8 @@ unsigned short get_value(const std::string &key, std::string &value);
  *
  * This function stores or updates the value associated with a given key in the loaded INI resource
  * and also updates the corresponding entry in the INI file on the filesystem.
+ * 
+ * @todo use another aproach that is not dump to store values, it removes all comments in file
  *
  * @param key The key whose value is to be stored or updated.
  * @param value The value to be stored.
