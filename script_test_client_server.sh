@@ -84,6 +84,7 @@ function test_server_and_client
 
 function test_1
 {
+    pushd bin
     run_bg_server
     local server_pid=$(pgrep -x "server_exe")
 
@@ -118,7 +119,7 @@ function test_1
     else
         echo "Port 12345 is no longer busy" | _apply_green_color
     fi
-
+    popd
 }
 
 function create_ini_file
@@ -130,6 +131,7 @@ function create_ini_file
 
 function test_2
 {
+    pushd bin
     echo Create $INI_DEMO_FILE_PATH
     create_ini_file
     echo Server turn on
@@ -162,6 +164,7 @@ function test_2
 
     echo Server shut down
     kill_server
+    popd
 }
 
 echo "### test 1 ###"
