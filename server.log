@@ -1,4 +1,5 @@
 Server listening on port 12345
+ERR: Unable to open file foo
 INF: file test_file/config.ini
  successfully loaded
 WRN: corrupted header Dummy

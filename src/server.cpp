@@ -6,9 +6,11 @@
 #include <unistd.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <mutex>
 #include "ini_handler.h"
 
 constexpr int PORT = 12345;
+std::mutex mtx;
 
 // Function to handle client requests
 void handle_client(int client_socket) {
@@ -17,13 +19,14 @@ void handle_client(int client_socket) {
     if (valread > 0) {
         std::string request(buffer, valread);
 
-        if (request.find("LOAD") == 0) {
+        if (request.find("LOAD") == 0) { // not-safe concurrent operation
+            std::lock_guard<std::mutex> guard(mtx);
             std::string path = request.substr(5); // Remove "LOAD " from the request
             const auto result = load_resource(path);
             std::string response = std::to_string(result) + "\n";
             send(client_socket, response.c_str(), response.size(), 0);
         } 
-        else if(request.find("GET") == 0) 
+        else if(request.find("GET") == 0) // safe concurrent operation
         {
             std::string key = request.substr(4); // Remove "GET" from the request
             std::string value;
@@ -32,8 +35,9 @@ void handle_client(int client_socket) {
             ss << std::to_string(result) << " " << value << std::endl;
             send(client_socket, ss.str().c_str(), ss.str().size(), 0);
         }
-        else if(request.find("SET") == 0) 
+        else if(request.find("SET") == 0) // not-safe concurrent operation
         {
+            std::lock_guard<std::mutex> guard(mtx);
             std::istringstream iss(request);
             std::string command, key, value;
             iss >> command >> key >> value;
@@ -85,6 +89,7 @@ int main() {
 
     std::cout << "Server listening on port " << PORT << std::endl;
 
+    // create a new thread for each request
     while (true) {
         if ((new_socket = accept(server_socket, (struct sockaddr *)&address, &addrlen)) < 0) {
             perror("accept");
