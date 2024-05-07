@@ -19,8 +19,8 @@ void handle_client(int client_socket) {
     if (valread > 0) {
         std::string request(buffer, valread);
 
-        if (request.find("LOAD") == 0) { // not-safe concurrent operation
-            std::lock_guard<std::mutex> guard(mtx);
+        if (request.find("LOAD") == 0) { 
+            std::lock_guard<std::mutex> guard(mtx); // not-safe concurrent operation
             std::string path = request.substr(5); // Remove "LOAD " from the request
             const auto result = load_resource(path);
             std::string response = std::to_string(result) + "\n";
@@ -35,12 +35,16 @@ void handle_client(int client_socket) {
             ss << std::to_string(result) << " " << value << std::endl;
             send(client_socket, ss.str().c_str(), ss.str().size(), 0);
         }
-        else if(request.find("SET") == 0) // not-safe concurrent operation
+        else if(request.find("SET") == 0) 
         {
-            std::lock_guard<std::mutex> guard(mtx);
+            std::lock_guard<std::mutex> guard(mtx); // not-safe concurrent operation
             std::istringstream iss(request);
             std::string command, key, value;
-            iss >> command >> key >> value;
+            iss >> command >> key;
+            // Read the rest of the line as the value
+            std::getline(iss, value);
+            // Remove leading and trailing whitespaces
+            value = value.substr(value.find_first_not_of(" \t"));
             const auto result = set_value(key, value);
             std::string response = std::to_string(result) + "\n";
             send(client_socket, response.c_str(), response.size(), 0);

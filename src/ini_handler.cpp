@@ -52,7 +52,7 @@ unsigned short load_resource(const std::string &path)
     }
     else
     {
-        ini_file_path = path;
+        ini_file_path = processedPath;
     }
 
     std::string current_section;
@@ -134,6 +134,9 @@ unsigned short get_value(const std::string &key, std::string &value)
 
 unsigned short set_value(const std::string &key, const std::string &value)
 {
+    std::string processedKey{key};
+    trimString(processedKey);
+
     // Check if a resource file has been loaded
     if (ini_data.empty())
     {
@@ -142,7 +145,7 @@ unsigned short set_value(const std::string &key, const std::string &value)
     }
 
     std::string iniSection, iniKey;
-    std::tie(iniSection, iniKey) = splitHeader(key);
+    std::tie(iniSection, iniKey) = splitHeader(processedKey);
 
     // update map
     ini_data[iniSection][iniKey] = value;
@@ -152,6 +155,9 @@ unsigned short set_value(const std::string &key, const std::string &value)
 
 unsigned short delete_value(const std::string &key)
 {
+    std::string processedKey{key};
+    trimString(processedKey);
+
     // Check if a resource file has been loaded
     if (ini_data.empty())
     {
@@ -160,7 +166,7 @@ unsigned short delete_value(const std::string &key)
     }
 
     std::string iniSection, iniKey;
-    std::tie(iniSection, iniKey) = splitHeader(key);
+    std::tie(iniSection, iniKey) = splitHeader(processedKey);
 
     // Find section
     auto section_it = ini_data.find(iniSection);

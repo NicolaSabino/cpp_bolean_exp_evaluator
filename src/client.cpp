@@ -52,7 +52,12 @@ int main(int argc, char *argv[])
 
     std::string command = argv[1];
     std::string arg1 = argv[2];
-    std::string arg2 = (argc >= 4) ? argv[3] : "";
+    std::stringstream ss;
+
+    // we faced some issues with "" quoted parameters
+    // in this way we merge the all in one string
+    for (int i = 3; i < argc; ++i) ss << argv[i] << " ";
+    std::string arg2 = ss.str();
 
     std::string request;
     if (command == "--load")
@@ -66,6 +71,7 @@ int main(int argc, char *argv[])
     else if (command == "--set")
     {
         request = "SET " + arg1 + " " + arg2 + "\n";
+        std::cout << "arg2: " << arg2 << std::endl;
     }
     else
     {

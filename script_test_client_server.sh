@@ -9,8 +9,8 @@ function forward_to_server
 
 function forward_to_client
 {
-    echo "Exec: ./client_exe $1"
-    ./client_exe $1
+    echo "Exec: ./client_exe $@"
+    ./client_exe $@
 }
 
 function run_bg_server
@@ -51,7 +51,7 @@ function test_server_and_client
     forward_to_client "--load test_file/config.ini"
     forward_to_client "--get Dummy"
     forward_to_client "--get Advanced.key5.subsection"
-    forward_to_client "--set section.color.red \"roses are red\""
+    forward_to_client --set section.color.red \"roses are red\"
 }
 
 
