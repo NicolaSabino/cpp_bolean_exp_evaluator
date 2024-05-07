@@ -1,7 +1,11 @@
 # Linux system exercise
 
-TODO add description
+Simple client server application 
+relying on a shared library for ini file management.
 
-## Online material
+## How to run
 
-[simple shared library tutorial](https://mprtmma.medium.com/c-shared-library-dynamic-linking-eps-1-bacf2c95d54f)
+```bash
+./script_build.sh
+./script_test_client.sh
+```
