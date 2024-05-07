@@ -1,4 +1,10 @@
-#include <iostream>
+/**
+ * @file test.cpp
+ * @author Nicola Sabino (nicola.sabino94@gmail.com)
+ * @brief Simple test file for shared library
+ * @version 0.1
+ * @date 2024-05-07
+ */
 #include <cassert>
 #include "ini_handler.h"
 

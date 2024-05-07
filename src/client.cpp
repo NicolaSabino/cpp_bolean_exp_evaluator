@@ -1,12 +1,25 @@
-#include <iostream>
+/**
+ * @file client.cpp
+ * @author Nicola Sabino (nicola.sabino94@gmail.com)
+ * @brief Simple client application
+ * @version 0.1
+ * @date 2024-05-07
+ */
 #include <string>
 #include <sstream>
 #include <unistd.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <iostream>
 
-std::string send_request(const std::string &request)
+/**
+ * @brief Send request to server
+ * 
+ * @param request The request string
+ * @return std::string The server response
+ */
+std::string sendRequest(const std::string &request)
 {
     int sock = 0, valread;
     struct sockaddr_in serv_addr;
@@ -71,7 +84,6 @@ int main(int argc, char *argv[])
     else if (command == "--set")
     {
         request = "SET " + arg1 + " " + arg2 + "\n";
-        std::cout << "arg2: " << arg2 << std::endl;
     }
     else
     {
@@ -79,8 +91,8 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    std::string response = send_request(request);
-    std::cout << "Response: " << response << std::endl;
+    std::string response = sendRequest(request);
+    std::cout << response << std::endl;
 
     return 0;
 }

@@ -1,8 +1,10 @@
 /**
  * @file ini_handler.cpp
- * @brief Implementation file for library.
+ * @author Nicola Sabino (nicolasabino94@gmail.com)
+ * @brief ini handler shared library implementation
+ * @version 0.1
+ * @date 2024-05-07
  */
-
 #include "ini_handler.h"
 #include <fstream>
 #include <iostream>
@@ -13,6 +15,15 @@
 std::map<std::string, std::map<std::string, std::string>> ini_data;
 std::string ini_file_path;
 
+/**
+ * @brief Trim string
+ * 
+ * Utility function
+ * Remove tabs spaces and new line at 
+ * string beginning and end
+ * 
+ * @param targetString The target string to be trimmed.
+ */
 void trimString(std::string &targetString)
 {
     targetString.erase(0, targetString.find_first_not_of(" \t"));
@@ -20,6 +31,19 @@ void trimString(std::string &targetString)
     targetString.erase(targetString.find_last_not_of("\n") + 1);
 }
 
+/**
+ * @brief Split header
+ * 
+ * Utility function
+ * Split a ini header into section and key
+ * 
+ * The section is always the first sequence of char 
+ * preceeding the first dot symbol.
+ * The key is the resto of char sequence, including dots symbols.
+ * 
+ * @param key The key, a.k.a header, to be processed.
+ * @return std::tuple<std::string, std::string> a touple containing section and key.
+ */
 std::tuple<std::string, std::string> splitHeader(const std::string &key)
 {
     // Find the last occurrence of the delimiter '.'
@@ -200,6 +224,12 @@ unsigned short delete_value(const std::string &key)
     return dump_values();
 }
 
+/**
+ * @brief Dump values into file
+ * 
+ * @return 0 if success
+ * @return 255 if not able to open the file
+ */
 unsigned short dump_values()
 {
     // Update the INI file on the filesystem

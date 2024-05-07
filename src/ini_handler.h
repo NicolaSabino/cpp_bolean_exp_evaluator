@@ -1,8 +1,10 @@
 /**
  * @file ini_handler.h
- * @brief Header file containing declaration of library functionalities.
+ * @author Nicola Sabino (nicolasabino94@gmail.com)
+ * @brief ini handler shared library header file
+ * @version 0.1
+ * @date 2024-05-07
  */
-
 #ifndef LIB_INI_HANDLER_H
 #define LIB_INI_HANDLER_H
 
